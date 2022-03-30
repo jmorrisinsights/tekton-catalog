@@ -8,7 +8,7 @@ spec:
     - bindings:
         - name: github-binding
       template:
-        name: template-cra
+        name: template-pii
 ---
 apiVersion: tekton.dev/v1beta1
 kind: EventListener
@@ -19,7 +19,7 @@ spec:
     - bindings:
         - name: gl-ci-binding
       template:
-        name: template-cra
+        name: template-pii
 ---
 apiVersion: tekton.dev/v1beta1
 kind: EventListener
@@ -30,4 +30,4 @@ spec:
     - bindings:
         - name: gl-pr-binding
       template:
-        name: template-cra
+        name: template-pii

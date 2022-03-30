@@ -2,7 +2,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: template-cra
+  name: template-pii
 spec:
   params:
     - name: apikey
@@ -38,6 +38,8 @@ spec:
       default: ""
     - name: repository
       description: The git repo
+    - name: git-token
+      description: The git token
 
     # Common command related params
     - name: custom-script
@@ -68,83 +70,9 @@ spec:
       description: (Optional) Enable verbose log messages
       default: "false"
 
-    # BOM related params
-    - name: asset-type
-      description: Security checks to run (apps, image, os, all)
-      default: "all"
-    - name: bom-report
-      description: Filepath to store generated Bill of Materials
-      default: "bom.json"
-    - name: docker-build-flags
-      description: (Optional) Customize docker build command for build stage scanning
-      default: ""
     - name: docker-registry-secret
       description: Secret to authenticate for docker-registry-url
-    - name: docker-registry-url
-      description: Registry url to use for docker login
-      default: ""
-    - name: docker-registry-username
-      description: Username to authenticate for docker-registry-url
-      default: ""
-    - name: gradle-exclude-configs
-      description: (Optional) Exclude gradle configurations, ex. 'runtimeClasspath,testCompileClasspath'
-      default: ""
-    - name: maven-exclude-scopes
-      description: (Optional) Exclude maven scopes, ex. 'test,compile'
-      default: ""
-    - name: nodejs-create-package-lock
-      description: (Optional) Enable the task to build the package-lock.json for node.js projects
-      default: "false"
-    - name: prev-report
-      description: Filepath to previous BoM report to skip Dockerfile or application manifest scans
-      default: ""
 
-    # Deploy Analytic related params
-    - name: deploy-report
-      description: Filepath to store generated Deploy Analytic report
-      default: "deploy.json"
-
-    # Vulnerability related params
-    - name: cveignore
-      description: (Optional) Filepath to cveignore
-      default: ""
-    - name: exclude-dev
-      description: (Optional) Exclude dev dependencies during vulnerability scan
-      default: "false"
-    - name: vulnerability-report
-      description: Filepath to store Vulnerability report, not stored if empty
-      default: "vulnerability.json"
-
-    # Terraform related parameters
-    - name: terraform-report
-      description: Filepath to store generated Terraform report
-      default: "terraform.json"
-    - name: tf-dir
-      description: (Optional) The directory where the terraform main entry file is found if not in parent directory
-      default: ""
-    - name: tf-plan
-      description: (Optional) Filepath to Terraform Plan file.
-      default: ""
-    - name: tf-var-file
-      description: (Optional) terraform var-file
-      default: ""
-    - name: tf-version
-      description: (Optional) The terraform version to use to create Terraform plan
-      default: "0.15.5"
-    - name: tf-policy-file
-      description: (Optional) Filepath to policy profile. This file should contain "scc_goals" and "scc_goal_parameters" that will overwrite default checks
-      default: ""
-    - name: tf-format
-      description: (Optional) Report format. Requires --policy-file. Supported values [OSCAL]
-      default: ""
-    - name: tf-state-file
-      description: (Optional) Path of terraform state file. Requires --format to be set to OSCAL.
-      default: ""
-
-    # User control params
-    - name: cra-scan-image
-      description: Image to use for `scan` task
-      default: "icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.2"
   resourcetemplates:
     - apiVersion: v1
       kind: PersistentVolumeClaim
@@ -164,14 +92,14 @@ spec:
       type: Opaque
       stringData:
         API_KEY: $(params.apikey)
-        DOCKER_SECRET: $(params.docker-registry-secret)
+        GIT_TOKEN: $(params.git-token)
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
         name: pipelinerun-$(uid)
       spec:
         pipelineRef:
-          name: pipeline-cra
+          name: pipeline-pii
         workspaces:
           - name: artifacts
             persistentVolumeClaim:
@@ -215,47 +143,4 @@ spec:
             value: $(params.toolchainid)
           - name: verbose
             value: $(params.verbose)
-          - name: asset-type
-            value: $(params.asset-type)
-          - name: bom-report
-            value: $(params.bom-report)
-          - name: docker-build-flags
-            value: $(params.docker-build-flags)
-          - name: docker-registry-url
-            value: $(params.docker-registry-url)
-          - name: docker-registry-username
-            value: $(params.docker-registry-username)
-          - name: gradle-exclude-configs
-            value: $(params.gradle-exclude-configs)
-          - name: maven-exclude-scopes
-            value: $(params.maven-exclude-scopes)
-          - name: nodejs-create-package-lock
-            value: $(params.nodejs-create-package-lock)
-          - name: prev-report
-            value: $(params.prev-report)
-          - name: deploy-report
-            value: $(params.deploy-report)
-          - name: cveignore
-            value: $(params.cveignore)
-          - name: exclude-dev
-            value: $(params.exclude-dev)
-          - name: vulnerability-report
-            value: $(params.vulnerability-report)
-          - name: terraform-report
-            value: $(params.terraform-report)
-          - name: tf-dir
-            value: $(params.tf-dir)
-          - name: tf-plan
-            value: $(params.tf-plan)
-          - name: tf-var-file
-            value: $(params.tf-var-file)
-          - name: tf-version
-            value: $(params.tf-version)
-          - name: tf-policy-file
-            value: $(params.tf-policy-file)
-          - name: tf-format
-            value: $(params.tf-format)
-          - name: tf-state-file
-            value: $(params.tf-state-file)
-          - name: cra-scan-image
-            value: $(params.cra-scan-image)
+          
