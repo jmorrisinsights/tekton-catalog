@@ -37,7 +37,10 @@ spec:
       description: Git token required to for GIT operations
       default: ""
 
-  default: "icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.2"
+    # User control params
+    - name: cra-scan-image
+      description: Image to use for `scan` task
+      default: "icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.2"
 
   stepTemplate:
     env:
@@ -54,6 +57,7 @@ spec:
 
   steps:
     - name: update-pii
+      image: $(params.cra-scan-image)
       env:
         - name: GITHUB_READ_TOKEN
           value: $(params.git-token)
