@@ -54,6 +54,33 @@ spec:
     - name: artifacts
 
   tasks:
+
+    - name: checkout
+      taskRef:
+        name: git-clone-repo
+      params:
+        - name: branch
+          value: $(params.branch)
+        - name: continuous-delivery-context-secret
+          value: "secure-properties"
+        - name: ibmcloud-api
+          value: $(params.ibmcloud-api)
+        - name: ibmcloud-apikey-secret-key
+          value: "apikey"
+        - name: pipeline-debug
+          value: $(params.pipeline-debug)
+        - name: pr-branch
+          value: $(params.pr-branch)
+        - name: pr-repository
+          value: $(params.pr-repository)
+        - name: repository
+          value: $(tasks.extract-repository-url.results.extracted-value)
+        - name: revision
+          value: $(params.commit-id)
+      workspaces:
+        - name: output
+          workspace: artifacts
+
     - name: update-pii-files
       taskRef:
         name: cra-update-pii
