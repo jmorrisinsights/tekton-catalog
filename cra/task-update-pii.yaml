@@ -93,8 +93,8 @@ spec:
           rm -rf node_modules
           export NLS_FOLDER_PATTERN=en
           git clone --depth 1 https://$GITHUB_READ_TOKEN@github.ibm.com/org-ids/pii
-          pii/run
-          #rm -rf pii # must remove to prevent unintentional side effects in future onepipeline CI tasks e.g. eslint errors in cd-broker in unit tests
+          # pii/run
+          rm -rf pii # must remove to prevent unintentional side effects in future onepipeline CI tasks e.g. eslint errors in cd-broker in unit tests
           echo "###### DONE PII SCRIPT ######"
 
       volumeMounts:
